@@ -116,7 +116,8 @@ class CRank(object):
         self.logger.debug(f'Encoded search URL: {search_url}')
 
         options = ChromeOptions()
-        options.add_argument("--headless")
+        options.add_argument('--incognito')
+        options.add_argument('--headless')
         options.add_argument(f'user-agent={headers}')
         options.add_argument(f'--proxy-server={socks_proxy}')
 
