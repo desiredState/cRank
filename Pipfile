@@ -8,12 +8,8 @@ verify_ssl = true
 [packages]
 iso3166 = "*"
 stem = "*"
-pysocks = "*"
-requests = {extras = ["socks"],version = "*"}
 numpy = "*"
 matplotlib = "*"
-beautifulsoup4 = "*"
-lxml = "*"
 selenium = "*"
 
 [requires]
