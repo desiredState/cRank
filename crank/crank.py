@@ -10,7 +10,7 @@ import numpy
 from iso3166 import countries
 from matplotlib import pyplot
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.options import Options as ChromeOptions
 from stem import process as tor
 
 
@@ -39,10 +39,12 @@ class CRank(object):
         """ Execute the cRank report.
         Args:
             :param platform (str): The platform to query (e.g. "youtube").
-            :param query (str): A query string (e.g. a YouTube video title).
-            :param matcher (str): A matcher (e.g. a specific YouTube video URL).
+            :param query (str): A query string (e.g. a YouTube video topic).
+            :param matcher (str): A matcher (e.g. a specific YouTube channel).
             :param socks_proxy (str): The TOR SOCKS proxy address.
             :param socks_port (int): The TOR SOCKS proxy port.
+        Return:
+            :return results (dict): cRank results.
         """
 
         self.logger.debug(f'Using platform: {platform}')
@@ -72,7 +74,7 @@ class CRank(object):
 
                 if platform == 'youtube':
                     rank = self.get_youtube_rank(
-                        proxy=f'socks5://{socks_proxy}:{socks_port}',
+                        socks_proxy=f'socks5://{socks_proxy}:{socks_port}',
                         headers=headers,
                         matcher=matcher,
                         query=query
@@ -97,24 +99,26 @@ class CRank(object):
         self.logger.debug(f'Results:\n{pformat(results)}')
         self.generate_graph(results)
 
-    def get_youtube_rank(self, proxy, headers, matcher, query):
+        return results
+
+    def get_youtube_rank(self, socks_proxy, headers, matcher, query):
         """ Return the YouTube search rank of a matcher given a search query.
         Args:
-            :param session:
-            :param headers:
-            :param matcher:
-            :param query:
+            :param socks_proxy (str): The TOR SOCKS proxy address.
+            :param headers (str): HTTP headers for browser emulation.
+            :param matcher (str): A matcher (e.g. a specific YouTube channel).
+            :param query (str): A query string (e.g. a YouTube video topic).
         Return:
-            :return:
+            :return (int): The search rank of the matcher.
         """
 
         search_url = f'https://www.youtube.com/results?{urlencode({"search_query": query})}'
         self.logger.debug(f'Encoded search URL: {search_url}')
 
-        options = Options()
+        options = ChromeOptions()
         options.add_argument("--headless")
         options.add_argument(f'user-agent={headers}')
-        options.add_argument(f'--proxy-server={proxy}')
+        options.add_argument(f'--proxy-server={socks_proxy}')
 
         driver = webdriver.Chrome(options=options)
         driver.get(search_url)
