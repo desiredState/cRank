@@ -16,11 +16,13 @@ from stem import process as tor
 
 class CRank(object):
     """
-        cRank accepts a query string (e.g. a YouTube video topic) and a matcher (e.g. a specific YouTube channel)
-        then cycles through a complete list of iso3166 countries, attempting to connect to a TOR node from each, and
-        generates a ranking report based on the country, the query string and the search ranking of the matcher.
-        The typical use-case of cRank is to determine if a matcher is being politically censored within a given country
-        by comparing its global search ranking results.
+        cRank accepts a query string (e.g. a YouTube video topic) and a matcher
+        (e.g. a specific YouTube channel) then cycles through a complete list
+        of iso3166 countries, attempting to connect to a TOR node from each,
+        and generates a ranking report based on the country, the query string
+        and the search ranking of the matcher. The typical use-case of cRank is
+        to determine if a matcher is being politically censored within a given
+        country by comparing its global search ranking results.
     """
 
     def __init__(self, debug=False):
@@ -35,7 +37,8 @@ class CRank(object):
         if debug:
             self.logger.setLevel(logging.DEBUG)
 
-    def run(self, platform, query, matcher, socks_proxy='127.0.0.1', socks_port=7321):
+    def run(self, platform, query, matcher,
+            socks_proxy='127.0.0.1', socks_port=7321):
         """ Execute the cRank report.
         Args:
             :param platform (str): The platform to query (e.g. "youtube").
@@ -52,8 +55,9 @@ class CRank(object):
         self.logger.debug(f'Using matcher: {matcher}')
         self.logger.debug(f'Using SOCKS proxy: {socks_proxy}:{socks_port}')
 
-        headers = {'User-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 '
-                                 '(KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36'}
+        headers = {'User-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X '
+                   '10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome'
+                   '/77.0.3865.90 Safari/537.36'}
 
         results = {}
 
@@ -83,7 +87,8 @@ class CRank(object):
                 results[country[0]] = rank
 
             except OSError:
-                self.logger.exception(f'No TOR node found in {country[1]}, skipping...')
+                self.logger.exception(f'No TOR node found in {country[1]},'
+                                      'skipping...')
                 continue
 
             except Exception as e:
@@ -112,7 +117,8 @@ class CRank(object):
             :return (int): The search rank of the matcher.
         """
 
-        search_url = f'https://www.youtube.com/results?{urlencode({"search_query": query})}'
+        search_url = f'https://www.youtube.com/results?' \
+                     '{urlencode({"search_query": query})}'
         self.logger.debug(f'Encoded search URL: {search_url}')
 
         options = ChromeOptions()
@@ -164,9 +170,11 @@ if __name__ == '__main__':
     parser.add_argument('-d', '--debug', action='store_true', default=False)
     parser.add_argument('-s', '--socks-proxy', type=str, default='127.0.0.1')
     parser.add_argument('-o', '--socks-port', type=int, default=7321)
-    parser.add_argument('-p', '--platform', type=str, required=True, choices=['youtube'])
     parser.add_argument('-q', '--query', type=str, required=True)
     parser.add_argument('-m', '--matcher', type=str, required=True)
+    parser.add_argument('-p', '--platform', type=str, required=True,
+                        choices=['youtube'])
+
     args = parser.parse_args()
 
     crank = CRank(debug=args.debug)
